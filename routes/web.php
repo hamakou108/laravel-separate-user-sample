@@ -40,7 +40,7 @@ Route::get('/home', function () {
 })->middleware(['auth'])->name('home');
 
 
-Route::get('/email/verify/{id}/{hash}', function (\Illuminate\Foundation\Auth\EmailVerificationRequest $request) {
+Route::get('/email/verify/{id}/{hash}', function (\App\Http\Requests\Auth\EmailVerificationRequest $request) {
     $request->fulfill();
 
     return redirect('/home');

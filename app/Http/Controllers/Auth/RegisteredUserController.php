@@ -5,13 +5,25 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
+use Domain\User\UserEmail;
+use Domain\User\UserName;
+use Domain\User\UserPassword;
+use Domain\User\UserRepository;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class RegisteredUserController extends Controller
 {
+    private UserRepository $repository;
+
+    public function __construct(UserRepository $repository)
+    {
+        $this->repository = $repository;
+    }
+
     /**
      * Display the registration view.
      *
@@ -38,11 +50,14 @@ class RegisteredUserController extends Controller
             'password' => 'required|string|confirmed|min:8',
         ]);
 
-        Auth::login($user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]));
+        $id = $this->repository->create(
+            new UserName($request->name),
+            new UserEmail($request->email),
+            new UserPassword(Hash::make($request->password))
+        );
+        $user = App::make(User::class, ['id' => $id]);
+
+        Auth::login($user);
 
         event(new Registered($user));
 
