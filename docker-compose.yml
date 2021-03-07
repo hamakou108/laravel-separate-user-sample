@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  app:
+    build: ./docker/php
+    ports:
+      - 8000:8000
+    depends_on:
+      - mysql
+    tty: true
+    volumes:
+      - .:/opt
+  mysql:
+    image: mysql:8.0.23
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: laravel
+      MYSQL_PASSWORD: root
+  mail:
+    image: mailhog/mailhog:v1.0.1
+    ports:
+      - 1025:1025
+      - 8025:8025
